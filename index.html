@@ -1,58 +1,81 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>WebcamJS Test Page</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>WebcamJS Test Page</title>
     <link rel="stylesheet" href="style.css" />
-    <script>
-      var i = 0;
-      function buttonClick() {
-        document.getElementById("inc").value = ++i;
-      }
-    </script>
   </head>
   <body>
-    <button onclick="buttonClick()">Click Me</button>
-    <input type="text" id="inc" value="0"></input>
-
     <div id="results">Your captured image will appear here...</div>
-	
-	<h1>WebcamJS Test Page</h1>
-	<h3>Demonstrates Adobe Flash capture &amp; display</h3>
-	
-	<div id="my_camera"></div>
-	
-	<!-- First, include the Webcam.js JavaScript Library -->
-	<script type="text/javascript" src="webcam.js"></script>
-	
-	<!-- Configure a few settings and attach camera -->
-	<script language="JavaScript">
-		Webcam.set({
-			width: 320,
-			height: 240,
-			force_flash: true,
-			image_format: 'jpeg',
-			jpeg_quality: 90
-		});
-		Webcam.attach( '#my_camera' );
-	</script>
-	
-	<!-- A button for taking snaps -->
-	<form>
-		<input type=button value="Take Snapshot" onClick="take_snapshot()">
-	</form>
-	
-	<!-- Code to handle taking the snapshot and displaying it locally -->
-	<script language="JavaScript">
-		function take_snapshot() {
-			// take snapshot and get image data
-			Webcam.snap( function(data_uri) {
-				// display results in page
-				document.getElementById('results').innerHTML = 
-					'<h2>Here is your image:</h2>' + 
-					'<img src="'+data_uri+'"/>';
-			} );
-		}
-	</script>
+
+    <h1>WebcamJS Test Page</h1>
+    <div>
+      <span id="w"></span>
+      <span id="h"></span>
+    </div>
+
+    <div id="my_camera"></div>
+    <script>
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+
+      document.getElementById("h").innerHTML = h;
+      document.getElementById("w").innerHTML = w;
+      document.getElementById(
+        "my_camera"
+      ).style = `width: ${w}px; height: ${h}px;`;
+
+      localStorage.setItem("images", JSON.stringify([]));
+    </script>
+
+    <!-- First, include the Webcam.js JavaScript Library -->
+    <script type="text/javascript" src="webcam.js"></script>
+
+    <!-- Configure a few settings and attach camera -->
+    <script language="JavaScript">
+      Webcam.set({
+        width: 320,
+        height: 240,
+        dest_width: 640,
+        dest_height: 480,
+        image_format: "jpeg",
+        jpeg_quality: 90,
+        flip_horiz: true,
+      });
+      Webcam.attach("#my_camera");
+    </script>
+
+    <!-- A button for taking snaps -->
+    <form>
+      <input type="button" value="Take Snapshot" onClick="take_snapshot()" />
+    </form>
+
+    <!-- Code to handle taking the snapshot and displaying it locally -->
+    <script language="JavaScript">
+        
+      function take_snapshot() {
+        
+        // take snapshot and get image data
+        Webcam.snap(function (data_uri) {
+            
+        var temp = JSON.parse(localStorage.getItem("images"));
+        temp.push(data_uri)
+          
+          localStorage.setItem("images", JSON.stringify(temp));
+        console.log(typeof temp);
+        console.log(temp);
+
+          for (let index = 0; index < temp.length; index++) {
+            var col = document.createElement("div");
+            col.innerHTML='<img src="' + temp[index] + '"/>';
+          }
+
+          document.getElementById("results").appendChild(col)
+        //   // display results in page
+        //   document.getElementById("results").innerHTML =
+        //     "<h2>Here is your image:</h2>" + '<img src="' + data_uri + '"/>';
+        });
+      }
+    </script>
   </body>
 </html>
